@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Activity, Users, Hospital, Ambulance, HeartPulse, Terminal, AlertTriangle, ShieldCheck } from 'lucide-react';
 import './SOSApp.css'; // Reusing styles
 
-const API_URL = `${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}`;
+const API_URL = `${import.meta.env.VITE_API_URL || `${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}`}`;
 
 export default function AdminDashboard() {
   const navigate = useNavigate();

@@ -64,7 +64,7 @@ export default function ReadinessPanel({ emergency, hospital }) {
               <button 
                 onClick={async () => {
                   try {
-                    await fetch(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/emergencies/${emergency._id}/hospital-response`, {
+                    await fetch(`${import.meta.env.VITE_API_URL || `${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}`}/emergencies/${emergency._id}/hospital-response`, {
                       method: 'PUT',
                       headers: {'Content-Type': 'application/json'},
                       body: JSON.stringify({ action: 'ACCEPT', hospital_id: hospital._id })

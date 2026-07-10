@@ -27,8 +27,8 @@ export default function Login() {
     const fetchData = async () => {
       try {
         const [hRes, aRes] = await Promise.all([
-          axios.get(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/hospitals`),
-          axios.get(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/ambulances`)
+          axios.get(`${import.meta.env.VITE_API_URL || `${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}`}/hospitals`),
+          axios.get(`${import.meta.env.VITE_API_URL || `${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}`}/ambulances`)
         ]);
         setHospitals(hRes.data);
         if (hRes.data.length > 0) setSelectedHospital(hRes.data[0]._id);
@@ -51,7 +51,7 @@ export default function Login() {
     try {
       if (loginType === 'HOSPITAL') {
         if (!selectedHospital) return alert("Select a hospital");
-        const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/login`, {
+        const res = await axios.post(`${import.meta.env.VITE_API_URL || `${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}`}/login`, {
           role: 'HOSPITAL',
           id: selectedHospital,
           password: password
@@ -61,7 +61,7 @@ export default function Login() {
         setTimeout(() => navigate('/hospital'), 500);
       } else {
         if (!selectedAmbulance) return alert("Select an ambulance");
-        const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/login`, {
+        const res = await axios.post(`${import.meta.env.VITE_API_URL || `${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}`}/login`, {
           role: 'AMBULANCE',
           id: selectedAmbulance,
           password: password
@@ -88,7 +88,7 @@ export default function Login() {
         available_icu_beds: parseInt(regData.total_icu_beds),
         specialties: ["General"]
       };
-      const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/hospitals`, payload);
+      const res = await axios.post(`${import.meta.env.VITE_API_URL || `${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}`}/hospitals`, payload);
       localStorage.setItem('loggedInHospital', JSON.stringify(res.data));
       navigate('/hospital');
     } catch (err) {

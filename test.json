@@ -1,0 +1,8 @@
+{
+    "patient_name": "Test",
+    "symptoms": "Chest pain",
+    "location": {
+        "lat": 40.7,
+        "lng": -74.0
+    }
+}

@@ -7,7 +7,7 @@ import EmergencyList from '../components/EmergencyList';
 import ReadinessPanel from '../components/ReadinessPanel';
 import './SOSApp.css'; // Reusing styles
 
-const API_URL = `${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}`;
+const API_URL = `${import.meta.env.VITE_API_URL || `${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}`}`;
 
 export default function Dashboard() {
   const navigate = useNavigate();

@@ -40,8 +40,8 @@ export default function SOSApp() {
     const fetchRefs = async () => {
       try {
         const [hRes, aRes] = await Promise.all([
-          axios.get(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/hospitals`),
-          axios.get(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/ambulances`)
+          axios.get(`${import.meta.env.VITE_API_URL || `${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}`}/hospitals`),
+          axios.get(`${import.meta.env.VITE_API_URL || `${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}`}/ambulances`)
         ]);
         setHospitals(hRes.data);
         setAmbulances(aRes.data);
@@ -58,7 +58,7 @@ export default function SOSApp() {
     if (step === 'EN_ROUTE' && activeEmergencyId) {
       const fetchEmergency = async () => {
         try {
-          const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/emergencies`);
+          const res = await axios.get(`${import.meta.env.VITE_API_URL || `${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}`}/emergencies`);
           const found = res.data.find(e => e._id === activeEmergencyId);
           if (found) {
             if (found.status === 'RESOLVED') {
@@ -93,7 +93,7 @@ export default function SOSApp() {
   const handleSaveProfile = async () => {
     if (!profile.name) return alert("Please enter at least your name.");
     try {
-      const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/patients`, profile);
+      const res = await axios.post(`${import.meta.env.VITE_API_URL || `${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}`}/patients`, profile);
       const newProfile = res.data;
       setProfile(newProfile);
       localStorage.setItem('patientProfile', JSON.stringify(newProfile));
@@ -128,7 +128,7 @@ export default function SOSApp() {
       };
 
       try {
-        const response = await axios.post(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/emergencies`, emergencyData);
+        const response = await axios.post(`${import.meta.env.VITE_API_URL || `${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}`}/emergencies`, emergencyData);
         if (response.data.first_aid_instructions) {
           setInstructions(response.data.first_aid_instructions);
         }
