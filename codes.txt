@@ -1,4 +1,5 @@
-Enable CORS in FASTAPI
+*Enable CORS in FASTAPI*
+(bcoz hmara react frontend hai and Fastapi backend - hme cross origin resource sharing (CORS) daalna prega)
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
