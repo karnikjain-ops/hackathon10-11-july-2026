@@ -135,6 +135,13 @@ async def get_ambulances():
         ambulances.append(AmbulanceModel(**document))
     return ambulances
 
+@app.post("/ambulances", response_model=AmbulanceModel)
+async def create_ambulance(ambulance: AmbulanceModel = Body(...)):
+    new_ambulance = await db.ambulances.insert_one(ambulance.model_dump(by_alias=True, exclude={"id"}))
+    created_ambulance = await db.ambulances.find_one({"_id": new_ambulance.inserted_id})
+    return created_ambulance
+
+
 @app.get("/emergencies", response_model=List[EmergencyModel])
 async def get_emergencies():
     emergencies = []

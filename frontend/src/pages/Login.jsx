@@ -20,15 +20,17 @@ export default function Login() {
     name: '',
     lat: '',
     lng: '',
-    total_icu_beds: 10
+    total_icu_beds: 10,
+    driver_name: '',
+    paramedic_contact: ''
   });
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const [hRes, aRes] = await Promise.all([
-          axios.get(`${import.meta.env.VITE_API_URL || `${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}`}/hospitals`),
-          axios.get(`${import.meta.env.VITE_API_URL || `${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}`}/ambulances`)
+          axios.get(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/hospitals`),
+          axios.get(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/ambulances`)
         ]);
         setHospitals(hRes.data);
         if (hRes.data.length > 0) setSelectedHospital(hRes.data[0]._id);
@@ -51,7 +53,7 @@ export default function Login() {
     try {
       if (loginType === 'HOSPITAL') {
         if (!selectedHospital) return alert("Select a hospital");
-        const res = await axios.post(`${import.meta.env.VITE_API_URL || `${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}`}/login`, {
+        const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/login`, {
           role: 'HOSPITAL',
           id: selectedHospital,
           password: password
@@ -61,7 +63,7 @@ export default function Login() {
         setTimeout(() => navigate('/hospital'), 500);
       } else {
         if (!selectedAmbulance) return alert("Select an ambulance");
-        const res = await axios.post(`${import.meta.env.VITE_API_URL || `${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}`}/login`, {
+        const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/login`, {
           role: 'AMBULANCE',
           id: selectedAmbulance,
           password: password
@@ -81,19 +83,31 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
     try {
-      const payload = {
-        name: regData.name,
-        location: { lat: parseFloat(regData.lat), lng: parseFloat(regData.lng) },
-        total_icu_beds: parseInt(regData.total_icu_beds),
-        available_icu_beds: parseInt(regData.total_icu_beds),
-        specialties: ["General"]
-      };
-      const res = await axios.post(`${import.meta.env.VITE_API_URL || `${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}`}/hospitals`, payload);
-      localStorage.setItem('loggedInHospital', JSON.stringify(res.data));
-      navigate('/hospital');
+      if (loginType === 'HOSPITAL') {
+        const payload = {
+          name: regData.name,
+          location: { lat: parseFloat(regData.lat), lng: parseFloat(regData.lng) },
+          total_icu_beds: parseInt(regData.total_icu_beds),
+          available_icu_beds: parseInt(regData.total_icu_beds),
+          specialties: ["General"]
+        };
+        const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/hospitals`, payload);
+        localStorage.setItem('loggedInHospital', JSON.stringify(res.data));
+        navigate('/hospital');
+      } else {
+        const payload = {
+          driver_name: regData.driver_name,
+          paramedic_contact: regData.paramedic_contact,
+          location: { lat: parseFloat(regData.lat), lng: parseFloat(regData.lng) },
+          status: "AVAILABLE"
+        };
+        const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/ambulances`, payload);
+        localStorage.setItem('loggedInAmbulance', JSON.stringify(res.data));
+        navigate('/ambulance');
+      }
     } catch (err) {
       console.error(err);
-      alert("Failed to register hospital");
+      alert(`Failed to register ${loginType.toLowerCase()}`);
       setLoading(false);
     }
   };
@@ -169,32 +183,48 @@ export default function Login() {
               {loading ? 'Authenticating...' : 'Secure Login'}
             </button>
             
-            {loginType === 'HOSPITAL' && (
-              <div style={{textAlign: 'center', fontSize: '0.9rem'}}>
-                <span style={{color: 'var(--text-secondary)'}}>Not in network? </span>
-                <a href="#" onClick={(e) => {e.preventDefault(); setIsRegistering(true);}} style={{color: 'var(--accent-blue)', textDecoration: 'none'}}>Register Hospital</a>
-              </div>
-            )}
+            <div style={{textAlign: 'center', fontSize: '0.9rem'}}>
+              <span style={{color: 'var(--text-secondary)'}}>Not in network? </span>
+              <a href="#" onClick={(e) => {e.preventDefault(); setIsRegistering(true);}} style={{color: 'var(--accent-blue)', textDecoration: 'none'}}>Register {loginType === 'HOSPITAL' ? 'Hospital' : 'Ambulance'}</a>
+            </div>
           </form>
         ) : (
           <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-            <div className="form-group">
-              <label>Hospital Name</label>
-              <input type="text" required value={regData.name} onChange={e => setRegData({...regData, name: e.target.value})} placeholder="e.g. Apollo Hospital" />
-            </div>
+            <h3 style={{margin: '0 0 10px 0', textAlign: 'center'}}>Register {loginType === 'HOSPITAL' ? 'Hospital' : 'Ambulance'}</h3>
+            
+            {loginType === 'HOSPITAL' ? (
+              <>
+                <div className="form-group">
+                  <label>Hospital Name</label>
+                  <input type="text" required value={regData.name} onChange={e => setRegData({...regData, name: e.target.value})} placeholder="e.g. Apollo Hospital" />
+                </div>
+                <div className="form-group">
+                  <label>Total ICU Beds</label>
+                  <input type="number" required value={regData.total_icu_beds} onChange={e => setRegData({...regData, total_icu_beds: e.target.value})} />
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="form-group">
+                  <label>Driver Name</label>
+                  <input type="text" required value={regData.driver_name} onChange={e => setRegData({...regData, driver_name: e.target.value})} placeholder="e.g. John Doe" />
+                </div>
+                <div className="form-group">
+                  <label>Paramedic Contact</label>
+                  <input type="text" required value={regData.paramedic_contact} onChange={e => setRegData({...regData, paramedic_contact: e.target.value})} placeholder="e.g. 9876543210" />
+                </div>
+              </>
+            )}
+            
             <div style={{display: 'flex', gap: '10px'}}>
               <div className="form-group" style={{flex: 1}}>
-                <label>Latitude</label>
+                <label>Initial Latitude</label>
                 <input type="number" step="any" required value={regData.lat} onChange={e => setRegData({...regData, lat: e.target.value})} placeholder="28.61" />
               </div>
               <div className="form-group" style={{flex: 1}}>
-                <label>Longitude</label>
+                <label>Initial Longitude</label>
                 <input type="number" step="any" required value={regData.lng} onChange={e => setRegData({...regData, lng: e.target.value})} placeholder="77.20" />
               </div>
-            </div>
-            <div className="form-group">
-              <label>Total ICU Beds</label>
-              <input type="number" required value={regData.total_icu_beds} onChange={e => setRegData({...regData, total_icu_beds: e.target.value})} />
             </div>
             
             <button type="submit" className="primary-btn">
