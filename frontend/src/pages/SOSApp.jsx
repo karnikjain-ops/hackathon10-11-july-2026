@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Activity, User, AlertCircle, MapPin, CheckCircle2, Ambulance, Hospital } from 'lucide-react';
+import { Activity, User, AlertCircle, MapPin, CheckCircle2, Ambulance, Hospital, Phone } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import './SOSApp.css'; 
 
@@ -266,6 +266,11 @@ export default function SOSApp() {
                       <div style={{marginLeft: '30px', fontSize: '0.9rem', color: 'var(--text-secondary)'}}>
                         Driver: {amb.driver_name} <br/>
                         Contact: +91 {amb.paramedic_contact}
+                        <div style={{marginTop: '10px'}}>
+                          <a href={`tel:${amb.paramedic_contact}`} style={{display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '8px 15px', backgroundColor: 'var(--accent-green)', color: '#000', textDecoration: 'none', borderRadius: '5px', fontWeight: 'bold', fontSize: '0.9rem'}}>
+                            <Phone size={14}/> Call Ambulance
+                          </a>
+                        </div>
                       </div>
                     );
                   }
