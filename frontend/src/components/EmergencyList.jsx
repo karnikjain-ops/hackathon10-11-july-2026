@@ -1,7 +1,7 @@
 import { AlertTriangle, Activity, MapPin } from 'lucide-react';
 import './EmergencyList.css';
 
-export default function EmergencyList({ emergencies }) {
+export default function EmergencyList({ emergencies, onSelectEmergency, selectedEmergencyId }) {
   
   const getPriorityColor = (priority) => {
     switch(priority) {
@@ -23,7 +23,15 @@ export default function EmergencyList({ emergencies }) {
           <p className="no-data">No active emergencies.</p>
         ) : (
           emergencies.map((em) => (
-            <div key={em._id} className="emergency-card" style={{ borderLeftColor: getPriorityColor(em.priority) }}>
+            <div 
+              key={em._id} 
+              className={`emergency-card ${selectedEmergencyId === em._id ? 'selected' : ''}`} 
+              style={{ 
+                borderLeftColor: getPriorityColor(em.priority),
+                background: selectedEmergencyId === em._id ? 'rgba(255,255,255,0.1)' : '' 
+              }}
+              onClick={() => onSelectEmergency && onSelectEmergency(em)}
+            >
               <div className="card-header">
                 <h3>{em.patient_name}</h3>
                 <span className="priority-badge" style={{ backgroundColor: getPriorityColor(em.priority) + '33', color: getPriorityColor(em.priority) }}>
@@ -41,8 +49,9 @@ export default function EmergencyList({ emergencies }) {
 
               <div className="card-footer">
                 <span className="status">{em.status}</span>
-                <span className="location">
-                  <MapPin size={14} /> {em.location.lat.toFixed(2)}, {em.location.lng.toFixed(2)}
+                <span className="location" style={{ fontSize: '0.75rem', maxWidth: '60%', textAlign: 'right' }}>
+                  <MapPin size={12} style={{display: 'inline', marginRight: '4px'}}/> 
+                  {em.address ? em.address.split(',').slice(0, 3).join(',') : `${em.location.lat.toFixed(2)}, ${em.location.lng.toFixed(2)}`}
                 </span>
               </div>
             </div>

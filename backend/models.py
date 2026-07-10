@@ -32,13 +32,28 @@ class Location(BaseModel):
     lat: float
     lng: float
 
+class PatientModel(BaseModel):
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    name: str
+    blood_type: Optional[str] = None
+    allergies: Optional[str] = None
+    conditions: Optional[str] = None
+
+    model_config = ConfigDict(
+        populate_by_name=True,
+        arbitrary_types_allowed=True,
+        json_encoders={ObjectId: str},
+    )
+
 class HospitalModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     name: str
+    password: str = Field(default="password123")
     location: Location
+    address: Optional[str] = None
     total_icu_beds: int
     available_icu_beds: int
-    resources: List[str] = []
+    specialties: List[str] = []
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -48,9 +63,11 @@ class HospitalModel(BaseModel):
 
 class AmbulanceModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    password: str = Field(default="password123")
     status: str = Field(..., description="AVAILABLE, EN_ROUTE, TRANSPORTING")
     location: Location
-    paramedic_contact: str
+    paramedic_contact: str = Field(default="9876543210")
+    driver_name: str = Field(default="Unknown Driver")
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -60,14 +77,21 @@ class AmbulanceModel(BaseModel):
 
 class EmergencyModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    patient_id: Optional[PyObjectId] = None
     patient_name: str
     symptoms: str
-    patient_profile: Optional[dict] = Field(default={}, description="Contains allergies, blood_type, conditions")
+    patient_profile: Optional[dict] = Field(default={}, description="Snapshot of allergies, blood_type, conditions")
     priority: int = Field(default=0, description="1 to 5, 1 being highest priority")
     location: Location
+    address: Optional[str] = None
     assigned_ambulance_id: Optional[PyObjectId] = None
     target_hospital_id: Optional[PyObjectId] = None
-    status: str = Field(default="PENDING", description="PENDING, ASSIGNED, EN_ROUTE_TO_HOSPITAL, RESOLVED")
+    pending_hospital_id: Optional[PyObjectId] = None
+    rejected_hospital_ids: List[PyObjectId] = []
+    eta: Optional[int] = None
+    first_aid_instructions: Optional[str] = None
+    route_path: Optional[List[List[float]]] = None
+    status: str = Field(default="PENDING_HOSPITAL_ACCEPTANCE", description="PENDING_HOSPITAL_ACCEPTANCE, EN_ROUTE_TO_HOSPITAL, RESOLVED")
 
     model_config = ConfigDict(
         populate_by_name=True,

@@ -1,32 +1,37 @@
 import re
+from typing import Dict, Any
 
-def analyze_symptoms_and_prioritize(symptoms: str) -> int:
+def analyze_symptoms_and_prioritize(symptoms: str) -> Dict[str, Any]:
     """
     Mock AI Service for Hackathon MVP.
     Analyzes the text of the symptoms and assigns a priority from 1 (Critical) to 5 (Minor).
-    If we get a real Gemini API key later, we can replace this logic with an LLM call.
+    Also provides contextual first-aid instructions.
     """
     symptoms_lower = symptoms.lower()
 
     # Priority 1: Life-threatening
-    p1_keywords = ["heart", "cardiac", "breathing", "unconscious", "stroke", "gunshot", "severe bleeding", "no pulse"]
-    if any(re.search(rf"\b{kw}\b", symptoms_lower) for kw in p1_keywords):
-        return 1
+    if any(re.search(rf"\b{kw}\b", symptoms_lower) for kw in ["heart", "cardiac", "stroke"]):
+        return {"priority": 1, "instructions": "Keep the patient calm and seated. Do not give them anything to eat or drink. If they have prescribed nitroglycerin, assist them with it. Be prepared to start CPR if they become unresponsive."}
+    
+    if any(re.search(rf"\b{kw}\b", symptoms_lower) for kw in ["breathing", "asthma", "choking"]):
+        return {"priority": 1, "instructions": "Help the patient into a comfortable sitting position. If they have an inhaler, help them use it. Encourage slow, deep breaths."}
+    
+    if any(re.search(rf"\b{kw}\b", symptoms_lower) for kw in ["severe bleeding", "gunshot", "stab"]):
+        return {"priority": 1, "instructions": "Apply direct, firm pressure to the wound with a clean cloth. Do not remove the cloth if it soaks through; add more layers on top."}
 
-    # Priority 2: Emergent, but not immediately life-threatening
-    p2_keywords = ["chest pain", "severe pain", "burns", "fracture", "head injury", "overdose"]
-    if any(re.search(rf"\b{kw}\b", symptoms_lower) for kw in p2_keywords):
-        return 2
+    if any(re.search(rf"\b{kw}\b", symptoms_lower) for kw in ["unconscious", "no pulse"]):
+        return {"priority": 1, "instructions": "Check for breathing. If no breathing, begin CPR immediately (push hard and fast in the center of the chest)."}
+
+    # Priority 2: Emergent
+    if any(re.search(rf"\b{kw}\b", symptoms_lower) for kw in ["burns"]):
+        return {"priority": 2, "instructions": "Cool the burn under cool (not cold) running water for at least 10 minutes. Do not apply ice, butter, or ointments. Cover lightly with a clean, dry dressing."}
+        
+    if any(re.search(rf"\b{kw}\b", symptoms_lower) for kw in ["fracture", "broken"]):
+        return {"priority": 2, "instructions": "Keep the injured area completely still. Do not attempt to realign the bone. Apply ice wrapped in a cloth to reduce swelling."}
 
     # Priority 3: Urgent
-    p3_keywords = ["bleeding", "broken", "allergic", "asthma", "seizure", "abdominal pain"]
-    if any(re.search(rf"\b{kw}\b", symptoms_lower) for kw in p3_keywords):
-        return 3
+    if any(re.search(rf"\b{kw}\b", symptoms_lower) for kw in ["allergic", "seizure"]):
+        return {"priority": 3, "instructions": "For allergies: use an EpiPen if available. For seizures: clear the area of hard objects, cushion their head, and do not put anything in their mouth."}
 
-    # Priority 4: Less Urgent
-    p4_keywords = ["fever", "sprain", "cut", "vomiting", "dizzy", "infection"]
-    if any(re.search(rf"\b{kw}\b", symptoms_lower) for kw in p4_keywords):
-        return 4
-
-    # Priority 5: Minor (Default if no keywords match)
-    return 5
+    # Default
+    return {"priority": 5, "instructions": "Stay calm and wait for the ambulance. Do not move the patient unless they are in immediate physical danger."}
