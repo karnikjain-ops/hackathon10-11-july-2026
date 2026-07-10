@@ -263,6 +263,19 @@ async def update_ambulance_location(id: str, payload: dict = Body(...)):
     )
     return {"message": "Location updated"}
 
+@app.put("/emergencies/{id}/location")
+async def update_emergency_location(id: str, payload: dict = Body(...)):
+    lat = payload.get("lat")
+    lng = payload.get("lng")
+    if lat is None or lng is None:
+        raise HTTPException(status_code=400, detail="Missing lat or lng")
+        
+    await db.emergencies.update_one(
+        {"_id": ObjectId(id)},
+        {"$set": {"location": {"lat": lat, "lng": lng}}}
+    )
+    return {"message": "Emergency location updated"}
+
 @app.put("/emergencies/{id}/hospital-response")
 async def hospital_response(id: str, background_tasks: BackgroundTasks, payload: dict = Body(...)):
     action = payload.get("action")

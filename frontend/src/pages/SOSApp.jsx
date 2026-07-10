@@ -52,13 +52,14 @@ export default function SOSApp() {
     fetchRefs();
   }, []);
 
-  // Poll active emergency
+  // Poll active emergency and watch location
   useEffect(() => {
     let interval;
+    let watchId;
     if (step === 'EN_ROUTE' && activeEmergencyId) {
       const fetchEmergency = async () => {
         try {
-          const res = await axios.get(`${import.meta.env.VITE_API_URL || `${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}`}/emergencies`);
+          const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/emergencies`);
           const found = res.data.find(e => e._id === activeEmergencyId);
           if (found) {
             if (found.status === 'RESOLVED') {
@@ -84,9 +85,29 @@ export default function SOSApp() {
       
       fetchEmergency(); // fetch immediately
       interval = setInterval(fetchEmergency, 3000);
+
+      // Start Real GPS Tracking for Patient
+      if (navigator.geolocation) {
+        watchId = navigator.geolocation.watchPosition(
+          async (position) => {
+            const { latitude, longitude } = position.coords;
+            try {
+              await axios.put(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/emergencies/${activeEmergencyId}/location`, {
+                lat: latitude,
+                lng: longitude
+              });
+            } catch (err) {
+              console.error("Failed to push patient GPS", err);
+            }
+          },
+          (err) => console.error("Patient GPS Error:", err),
+          { enableHighAccuracy: true, maximumAge: 0 }
+        );
+      }
     }
     return () => {
       if (interval) clearInterval(interval);
+      if (watchId) navigator.geolocation.clearWatch(watchId);
     }
   }, [step, activeEmergencyId]);
 
