@@ -1,14 +1,10 @@
-# Emergency Medical Response System (EMRS) - SwiftAid
+# Project Setup Instructions
 
-## Problem_statement_3
-
-Welcome to the Emergency Medical Response System (EMRS). This project is a smart, real-time healthcare dispatch and SOS system designed to drastically reduce ambulance response times and streamline hospital coordination during medical emergencies.
+Welcome to the Emergency Medical Response System (EMRS). This guide will help you set up and run the project locally on your machine.
 
 The project is split into two parts:
 1. **Backend**: Built with Python and FastAPI.
 2. **Frontend**: Built with React and Vite.
-
----
 
 ## Prerequisites
 
@@ -81,7 +77,7 @@ The frontend is a React application powered by Vite.
 
 2. **Navigate to the frontend directory:**
    ```bash
-   cd frontend
+   cd healthcare/frontend
    ```
 
 3. **Install the dependencies:**
